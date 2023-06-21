@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "hexlet-code"
+version = "0.1.0"
+description = "Shows the difference between two files."
+authors = ["Alex Kositskiy <koso-96@mail.ru>"]
+license = "Aladdin Free Public License (AFPL)"
+readme = "README.md"
+repository = "https://github.com/CfyRJ/python-project-50"
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Intended Audience :: Other Audience",
+    "License :: Aladdin Free Public License (AFPL)",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+]
+packages = [{ include = "gendiff" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.scripts]
+gendiff = "gendiff.scripts.gendiff_script:main"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.3.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
