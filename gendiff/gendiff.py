@@ -1,30 +1,78 @@
 import json
 
 
-def generate_diff(file1_path: str, file2_path: str) -> str:
-    values_up_to = json.load(open(file1_path))
-    values_after = json.load(open(file2_path))
+PREFIX_F1 = '  -'
+PREFIX_F2 = '  +'
+PREFIX_NOT_CHANGE = '   '
+START_RES = '{'
+END_RES = '}'
+
+
+def make_value_json(path: str) -> dict:
+    value = json.load(open(path))
+
+    return value if isinstance(value, dict) else {}
+
+
+def generate_diff(path_file1: str, path_file2: str) -> str:
+    value_up_to = make_value_json(path_file1)
+    value_after = make_value_json(path_file2)
+
+    k1 = list(value_up_to.keys())
+    k2 = list(value_after.keys())
 
     values = []
+    keys = set(k1 + k2)
 
-    for k, v in values_up_to.items():
-        if k in values_after.keys() and values_after[k] == v:
-            values += [['   ', k, v]]
+    for k in keys:
+        v1 = value_up_to.get(k)
+        v2 = value_after.get(k)
+
+        if k in k1 and k not in k2:
+            values.append([PREFIX_F1, k, v1])
             continue
-        if k in values_after.keys() and values_after[k] != v:
-            values += [['  -', k, v], ['  +', k, values_after[k]]]
+        if k not in k1 and k in k2:
+            values.append([PREFIX_F2, k, v2])
             continue
-        values += [['  -', k, v]]
-    
-    for k, v in values_after.items():
-        if k not in values_up_to.keys():
-            values += [['  +', k, v]]
-    
+        if v1 == v2:
+            values.append([PREFIX_NOT_CHANGE, k, v1])
+            continue
+
+        values.append([PREFIX_F1, k, v1])
+        values.append([PREFIX_F2, k, v2])
+
     values.sort(key=lambda x: x[1])
-    values = ['{'] + list(map(lambda x: f'{x[0]} {x[1]}: {x[2]}', values)) + ['}']
-    values = '\n'.join(values)
+    res = [START_RES] + list(map(lambda x: f'{x[0]} {x[1]}: {x[2]}', values)) + [END_RES]
+    res = '\n'.join(res)
 
-    return values
+    return res
+# import json
+
+
+# def generate_diff(file1_path: str, file2_path: str) -> str:
+#     values_up_to = json.load(open(file1_path))
+#     values_after = json.load(open(file2_path))
+
+#     values = []
+
+#     for k, v in values_up_to.items():
+#         if k in values_after.keys() and values_after[k] == v:
+#             values += [['   ', k, v]]
+#             continue
+#         if k in values_after.keys() and values_after[k] != v:
+#             values += [['  -', k, v], ['  +', k, values_after[k]]]
+#             continue
+#         values += [['  -', k, v]]
+    
+#     for k, v in values_after.items():
+#         if k not in values_up_to.keys():
+#             values += [['  +', k, v]]
+    
+#     values.sort(key=lambda x: x[1])
+#     values = ['{'] + list(map(lambda x: f'{x[0]} {x[1]}: {x[2]}', values)) + ['}']
+#     values = '\n'.join(values)
+
+#     return values
 
 
 
