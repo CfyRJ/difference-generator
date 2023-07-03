@@ -42,7 +42,9 @@ def generate_diff(path_file1: str, path_file2: str) -> str:
         values.append([PREFIX_F2, k, v2])
 
     values.sort(key=lambda x: x[1])
-    res = [START_RES] + list(map(lambda x: f'{x[0]} {x[1]}: {x[2]}', values)) + [END_RES]
+    res = [START_RES] \
+        + list(map(lambda x: f'{x[0]} {x[1]}: {x[2]}', values)) \
+        + [END_RES]
     res = '\n'.join(res)
 
     return res
