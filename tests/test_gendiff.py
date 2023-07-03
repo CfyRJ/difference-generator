@@ -1,8 +1,8 @@
 from gendiff.gendiff import generate_diff
 
 
-P1 = 'data/file1.json'
-P2 = 'data/file2.json'
+P1 = 'tests/fixtures/file1.json'
+P2 = 'tests/fixtures/file2.json'
 
 
 def test_generate_diff():
