@@ -18,6 +18,7 @@ packages = [{ include = "gendiff" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+pytest-cov = "^4.1.0"
 
 [tool.poetry.scripts]
 gendiff = "gendiff.scripts.gendiff_script:main"
