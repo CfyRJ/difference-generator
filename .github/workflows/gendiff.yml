@@ -26,3 +26,8 @@ jobs:
         run: |
           make lint
           make pytest
+      - uses: paambaati/codeclimate-action@v2.2.4
+        env:
+          CC_TEST_REPORTER_ID: 6bba193bdabbb13988326efe2dc9bac1ea9f0c4735312502d3e277f8a7931650
+        with:
+          coverageCommand: pytest coverage
