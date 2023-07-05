@@ -1,4 +1,4 @@
-import json
+from gendiff.make_data import make_value
 
 
 PREFIX_F1 = '  -'
@@ -8,15 +8,10 @@ START_RES = '{'
 END_RES = '}'
 
 
-def make_value_json(path: str) -> dict:
-    value = json.load(open(path))
-
-    return value if isinstance(value, dict) else {}
-
-
 def generate_diff(path_file1: str, path_file2: str) -> str:
-    value_up_to = make_value_json(path_file1)
-    value_after = make_value_json(path_file2)
+
+    value_up_to = make_value(path_file1)
+    value_after = make_value(path_file2)
 
     k1 = list(value_up_to.keys())
     k2 = list(value_after.keys())
@@ -50,10 +45,13 @@ def generate_diff(path_file1: str, path_file2: str) -> str:
     return res
 
 
-# p1 = 'second-project/python-project-50/data/file1.json'
-# p2 = 'second-project/python-project-50/data/file2.json'
+# p1 = 'second-project/python-project-50/tests/fixtures/file1.json'
+# p2 = 'second-project/python-project-50/tests/fixtures/file2.json'
 
-# generate_diff(p1, p2)
+# p1 = 'second-project/python-project-50/tests/fixtures/file1.yml'
+# p2 = 'second-project/python-project-50/tests/fixtures/file2.yml'
+
+# print(generate_diff(p1, p2))
 
 # if __name__ == '__main__':
 #     main()
