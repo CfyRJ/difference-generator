@@ -18,7 +18,7 @@ def make_value_json(path: str) -> dict:
 def make_value_yaml(path: str) -> dict:
     with open(path) as f:
         value = yaml.load(f, Loader=yaml.SafeLoader)
-    
+
     return value if isinstance(value, dict) else {}
 
 
