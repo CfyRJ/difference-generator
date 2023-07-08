@@ -1,46 +1,93 @@
 from gendiff.make_data import make_value
 
 
-PREFIX_F1 = '  -'
-PREFIX_F2 = '  +'
-PREFIX_NOT_CHANGE = '   '
+PREFIX_F1 = '  - '
+PREFIX_F2 = '  + '
+
+INDENT = '    '
+
 START_RES = '{'
 END_RES = '}'
 
 
-def generate_diff(path_file1: str, path_file2: str) -> str:
+def stylish(values: list) -> str:
+    res = []
+    n, pr, k, val = values[0], values[1], values[2], values[3]
 
-    value_up_to = make_value(path_file1)
-    value_after = make_value(path_file2)
+    if isinstance(val, list):
+        res += [f'{n*INDENT}{pr}{k}: {START_RES}']
 
-    k1 = list(value_up_to.keys())
-    k2 = list(value_after.keys())
+        for v in val:
+            if isinstance(v, list):
+                res += stylish(v)
 
-    values = []
+        res += [f'{n*INDENT}{INDENT}{END_RES}']
+    else:
+        res += [f'{n*INDENT}{pr}{k}: {val}']
+
+    return res
+
+
+def get_diff(value_old: dict, value_new: dict, nesting=0) -> list:
+    k1 = list(value_old.keys())
+    k2 = list(value_new.keys())
     keys = set(k1 + k2)
 
+    values = []
+
     for k in keys:
-        v1 = value_up_to.get(k)
-        v2 = value_after.get(k)
+        v1 = value_old.get(k)
+        v2 = value_new.get(k)
+
+        if isinstance(v1, dict) and isinstance(v2, dict):
+            values.append([nesting, INDENT, k, get_diff(v1, v2, nesting + 1)])
+            continue
+
+        if isinstance(v1, dict):
+            v1 = get_diff(v1, v1, nesting + 1)
+        if isinstance(v2, dict):
+            v2 = get_diff(v2, v2, nesting + 1)
 
         if k in k1 and k not in k2:
-            values.append([PREFIX_F1, k, v1])
+            values.append([nesting, PREFIX_F1, k, v1])
             continue
+
         if k not in k1 and k in k2:
-            values.append([PREFIX_F2, k, v2])
+            values.append([nesting, PREFIX_F2, k, v2])
             continue
+
         if v1 == v2:
-            values.append([PREFIX_NOT_CHANGE, k, v1])
+            values.append([nesting, INDENT, k, v1])
             continue
 
-        values.append([PREFIX_F1, k, v1])
-        values.append([PREFIX_F2, k, v2])
+        if isinstance(v1, dict) and isinstance(v2, dict):
+            values.append([nesting, INDENT, k, get_diff(v1, v2, nesting + 1)])
+            continue
 
-    values.sort(key=lambda x: x[1])
-    res = [START_RES] \
-        + list(map(lambda x: f'{x[0]} {x[1]}: {x[2]}', values)) \
-        + [END_RES]
-    res = '\n'.join(res)
+        values.append([nesting, PREFIX_F1, k, v1])
+        values.append([nesting, PREFIX_F2, k, v2])
+
+    values.sort(key=lambda x: x[2])
+
+    return values
+
+
+def generate_diff(path_file1: str, path_file2: str) -> str:
+
+    value_old = make_value(path_file1)
+    value_new = make_value(path_file2)
+
+    values = get_diff(value_old, value_new)
+
+    res = []
+    for val in values:
+        res += stylish(val)
+
+    res = '\n'.join((START_RES, *res, END_RES))
+
+    v_rs = {'False': 'false', 'True': 'true', 'None': 'null'}
+    for k, v in v_rs.items():
+        res = res.replace(k, v)
 
     return res
 
@@ -51,7 +98,9 @@ def generate_diff(path_file1: str, path_file2: str) -> str:
 # p1 = 'second-project/python-project-50/tests/fixtures/file1.yml'
 # p2 = 'second-project/python-project-50/tests/fixtures/file2.yml'
 
-# print(generate_diff(p1, p2))
+# res = generate_diff(p1, p2)
+# print(res, type(res))
+
 
 # if __name__ == '__main__':
 #     main()
