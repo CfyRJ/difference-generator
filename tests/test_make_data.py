@@ -37,5 +37,5 @@ def test_make_value_json():
     assert make_value(PATH_FILE_JSON) == CHECK
 
 
-# def test_make_value_yaml():
-#     assert make_value(PATH_FILE_YAML) == CHECK
+def test_make_value_yaml():
+    assert make_value(PATH_FILE_YAML) == CHECK
