@@ -1,8 +1,12 @@
 from gendiff.gendiff import generate_diff
 
 
-P1 = 'tests/fixtures/file1.json'
-P2 = 'tests/fixtures/file2.json'
+P1_JSON = 'tests/fixtures/file1.json'
+P2_JSON = 'tests/fixtures/file2.json'
+
+P1_YAML = 'tests/fixtures/file1.yml'
+P2_YAML = 'tests/fixtures/file2.yml'
+
 CHECK = """{
     common: {
       + follow: false
@@ -49,7 +53,13 @@ CHECK = """{
 }"""
 
 
-def test_generate_diff():
-    res = generate_diff(P1, P2)
+def test_generate_diff_json():
+    res = generate_diff(P1_JSON, P2_JSON)
+
+    assert res == CHECK
+
+
+def test_generate_diff_yaml():
+    res = generate_diff(P1_YAML, P2_YAML)
 
     assert res == CHECK
