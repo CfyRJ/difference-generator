@@ -9,6 +9,21 @@ INDENT = '    '
 START_RES = '{'
 END_RES = '}'
 
+CONSTANT_JSON = {'False': 'false', 'True': 'true', 'None': 'null'}
+CONSTANT_YAML = {'False': 'false', 'True': 'true', 'None': 'null'}
+
+
+def conversion_file_type(val_dif: str, format: str) -> str:
+    if format == 'json':
+        format = CONSTANT_JSON
+    if format in ('yaml', 'yml'):
+        format = CONSTANT_YAML
+
+    for k, v in format.items():
+        val_dif = val_dif.replace(k, v)
+
+    return val_dif
+
 
 def stylish(values: list) -> str:
     res = []
@@ -73,6 +88,7 @@ def get_diff(value_old: dict, value_new: dict, nesting=0) -> list:
 
 
 def generate_diff(path_file1: str, path_file2: str) -> str:
+    type_file1 = path_file1.split('.')[-1]
 
     value_old = make_value(path_file1)
     value_new = make_value(path_file2)
@@ -84,10 +100,7 @@ def generate_diff(path_file1: str, path_file2: str) -> str:
         res += stylish(val)
 
     res = '\n'.join((START_RES, *res, END_RES))
-
-    v_rs = {'False': 'false', 'True': 'true', 'None': 'null'}
-    for k, v in v_rs.items():
-        res = res.replace(k, v)
+    res = conversion_file_type(res, type_file1)
 
     return res
 
