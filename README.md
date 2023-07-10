@@ -1,3 +1,7 @@
+# python-package-generate-difference
+
+### Outputs the result of comparing two files as a multiline string. Works with json and yaml/yml files. Files must contain dictionaries of any nesting. Can work as a Python package.
+
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/CfyRJ/python-project-50/workflows/hexlet-check/badge.svg)](https://github.com/CfyRJ/python-project-50/actions/workflows/hexlet-check.yml)
 [![Actions Status](https://github.com/CfyRJ/python-project-50/actions/workflows/gendiff.yml/badge.svg?branch=main)](https://github.com/CfyRJ/python-project-50/actions/workflows/gendiff.yml)
