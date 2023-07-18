@@ -1,4 +1,4 @@
-from gendiff.make_data import make_value
+from make_data import make_value
 
 
 PREFIX_F1 = '  - '
@@ -39,6 +39,65 @@ def stylish(values: list) -> str:
         res += [f'{n*INDENT}{INDENT}{END_RES}']
     else:
         res += [f'{n*INDENT}{pr}{k}: {val}']
+
+    return res
+
+
+VAL_DEFAULT = {
+    PREFIX_F1: ' was removed',
+    PREFIX_F2: ' was added with value: ',
+    'change': ' was updated. From ',
+    }
+
+
+def make_flat(data: list) -> list:
+    if not isinstance(data, list):
+        return data
+    
+    lenght = len(data)
+    res = []
+    i = 0
+
+    while i < lenght:
+        
+        el1 = data[i]
+        el2 = data[i+1] if i + 1 < lenght else False
+
+        key_ = f"{el1[2]}" if el1[0] == 0 else f".{el1[2]}"
+        val1 = '[complex value]' if isinstance(el1[3], list) else f"'{el1[3]}'"
+
+        if el2 and el1[2] == el2[2]:
+            # key_ = f"<{el1[2]}>" if el1[0] == 0 else f"+{el1[2]}>"
+            # val1 = '[complex value]' if isinstance(el1[3], list) else f'{el1[3]}'
+            val2 = '[complex value]' if isinstance(el2[3], list) else f"'{el2[3]}'"
+
+            # res += [f'{key_} {VAL_DEFAULT["change"]} {val1} to {val2}']
+            res.append(key_ + VAL_DEFAULT["change"] + f"{val1} to {val2}")
+
+            i += 1
+
+        elif el1[1] == PREFIX_F1:
+            # key_ = f"<{el1[2]}>" if el1[0] == 0 else f"+{el1[2]}>"
+
+            # res += [f'{key_} {VAL_DEFAULT[el1[1]]}']
+            res.append(key_ + VAL_DEFAULT[el1[1]])
+
+        elif el1[1] == PREFIX_F2:
+            # key_ = f"<{el1[2]}>" if el1[0] == 0 else f"+{el1[2]}>"
+            # val1 = '[complex value]' if isinstance(el1[3], list) else f'{el1[3]}'
+
+            # res += [f'{key_} {VAL_DEFAULT[el1[1]]} {val1}']
+            res.append(key_ + VAL_DEFAULT[el1[1]] + f"{val1}")
+
+        elif isinstance(el1[3], list):
+            # key_ = f"<{el1[2]}>" if el1[0] == 0 else f"+{el1[2]}>"
+            # res += [f'{key_}{make_flat(el1[3])}']
+            # res.append(key_ + make_flat(el1[3]))
+            # res.append(key_)
+            for x in make_flat(el1[3]):
+                res.append(key_ + x)
+        
+        i += 1
 
     return res
 
@@ -95,24 +154,36 @@ def generate_diff(path_file1: str, path_file2: str) -> str:
 
     values = get_diff(value_old, value_new)
 
-    res = []
-    for val in values:
-        res += stylish(val)
+    # res = []
+    # for val in values:
+    #     res += stylish(val)
+    res = make_flat(values)
 
-    res = '\n'.join((START_RES, *res, END_RES))
-    res = conversion_file_type(res, type_file1)
+    # res = '\n'.join((START_RES, *res, END_RES))
+    # res = conversion_file_type(res, type_file1)
 
     return res
 
 
-# p1 = 'second-project/python-project-50/tests/fixtures/file1.json'
-# p2 = 'second-project/python-project-50/tests/fixtures/file2.json'
+p1 = 'second-project/python-project-50/tests/fixtures/file1.json'
+p2 = 'second-project/python-project-50/tests/fixtures/file2.json'
 
 # p1 = 'second-project/python-project-50/tests/fixtures/file1.yml'
 # p2 = 'second-project/python-project-50/tests/fixtures/file2.yml'
 
-# res = generate_diff(p1, p2)
+res = generate_diff(p1, p2)
 # print(res, type(res))
+
+res = list(map(lambda x: ' '.join(['Property ' + f"'{x.split()[0]}'"] + x.split()[1:]), res))
+res = '\n'.join(res)
+C_J = {'False': 'false', 'True': 'true', 'None': 'null', }
+for k, v in C_J.items():
+    res = res.replace(f"'{k}'", v)
+
+print(res)
+
+# for a in res:
+#     print(a)
 
 
 # if __name__ == '__main__':
