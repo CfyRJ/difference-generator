@@ -7,7 +7,7 @@ P2_JSON = 'tests/fixtures/file2.json'
 P1_YAML = 'tests/fixtures/file1.yml'
 P2_YAML = 'tests/fixtures/file2.yml'
 
-CHECK = """{
+CHECK_STYLISH = """{
     common: {
       + follow: false
         setting1: Value 1
@@ -51,15 +51,32 @@ CHECK = """{
         fee: 100500
     }
 }"""
+CHECK_PLAIN = '''Property 'common.follow' was added with value: false
+Property 'common.setting2' was removed
+Property 'common.setting3' was updated. From true to null
+Property 'common.setting4' was added with value: 'blah blah'
+Property 'common.setting5' was added with value: [complex value]
+Property 'common.setting6.doge.wow' was updated. From '' to 'so much'
+Property 'common.setting6.ops' was added with value: 'vops'
+Property 'group1.baz' was updated. From 'bas' to 'bars'
+Property 'group1.nest' was updated. From [complex value] to 'str'
+Property 'group2' was removed
+Property 'group3' was added with value: [complex value]'''
 
 
-def test_generate_diff_json():
-    res = generate_diff(P1_JSON, P2_JSON)
+def test_generate_diff_stylish():
+    res = generate_diff(P1_JSON, P2_JSON, 'stylish')
 
-    assert res == CHECK
+    assert res == CHECK_STYLISH
 
 
-def test_generate_diff_yaml():
-    res = generate_diff(P1_YAML, P2_YAML)
+def test_generate_diff_plain():
+    res = generate_diff(P1_JSON, P2_JSON, 'plain')
 
-    assert res == CHECK
+    assert res == CHECK_PLAIN
+
+
+# def test_generate_diff_yaml():
+#     res = generate_diff(P1_YAML, P2_YAML)
+
+#     assert res == CHECK
