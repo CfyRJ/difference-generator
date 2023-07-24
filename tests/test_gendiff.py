@@ -1,3 +1,6 @@
+import json
+
+
 from gendiff.gendiff import generate_diff
 
 
@@ -62,10 +65,11 @@ Property 'group1.baz' was updated. From 'bas' to 'bars'
 Property 'group1.nest' was updated. From [complex value] to 'str'
 Property 'group2' was removed
 Property 'group3' was added with value: [complex value]'''
+CHECK_JSON = json.load(open('tests/fixtures/check_json.json'))
 
 
 def test_generate_diff_stylish():
-    res = generate_diff(P1_JSON, P2_JSON, 'stylish')
+    res = generate_diff(P1_JSON, P2_JSON,)
 
     assert res == CHECK_STYLISH
 
@@ -76,7 +80,25 @@ def test_generate_diff_plain():
     assert res == CHECK_PLAIN
 
 
-# def test_generate_diff_yaml():
-#     res = generate_diff(P1_YAML, P2_YAML)
+def test_generate_diff_json():
+    res = generate_diff(P1_JSON, P2_JSON, 'json')
 
-#     assert res == CHECK
+    assert json.loads(res) == CHECK_JSON
+
+
+def test_generate_diff_yaml_stylish():
+    res = generate_diff(P1_YAML, P2_YAML,)
+
+    assert res == CHECK_STYLISH
+
+
+def test_generate_diff_yaml_plain():
+    res = generate_diff(P1_YAML, P2_YAML, 'plain')
+
+    assert res == CHECK_PLAIN
+
+
+def test_generate_diff_yaml_json():
+    res = generate_diff(P1_YAML, P2_YAML, 'json')
+
+    assert json.loads(res) == CHECK_JSON
