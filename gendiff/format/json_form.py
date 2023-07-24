@@ -1,22 +1,17 @@
 import json
-from format.stylish import stylish
 
 
 def make_dict(data: list) -> dict:
     res = {}
-    n, pr, k, val = data[0], data[1], data[2], data[3]
+    pr, k, val = data[1], data[2], data[3]
 
     if isinstance(val, list):
+        res[pr + k] = {}
 
         for v in val:
-            if isinstance(v, list):
-                # res += [(pr + k, make_dict(v))]
-                value = {}
-                value.update(dict(make_dict(v)))
-            res[pr + k] = value
+            res[pr + k].update(make_dict(v))
 
     else:
-        # res += [(pr + k, val)]
         res[pr + k] = val
 
     return res
@@ -26,9 +21,8 @@ def json_form(data: list) -> json:
     if not isinstance(data, list):
         return 'Error type'
 
-    res = []
+    res = {}
     for val in data:
-        res += [make_dict(val)]
+        res.update(make_dict(val))
 
-    # return json.dumps(res, sort_keys=True, indent=4)
-    return res
+    return json.dumps(res, sort_keys=True, indent=4)
