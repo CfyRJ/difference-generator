@@ -1,0 +1,44 @@
+{
+    "    common": {
+        "    setting1": "Value 1",
+        "    setting6": {
+            "    doge": {
+                "  + wow": "so much",
+                "  - wow": ""
+            },
+            "    key": "value",
+            "  + ops": "vops"
+        },
+        "  + follow": false,
+        "  + setting3": null,
+        "  + setting4": "blah blah",
+        "  + setting5": {
+            "    key5": "value5"
+        },
+        "  - setting2": 200,
+        "  - setting3": true
+    },
+    "    group1": {
+        "    foo": "bar",
+        "  + baz": "bars",
+        "  + nest": "str",
+        "  - baz": "bas",
+        "  - nest": {
+            "    key": "value"
+        }
+    },
+    "  + group3": {
+        "    deep": {
+            "    id": {
+                "    number": 45
+            }
+        },
+        "    fee": 100500
+    },
+    "  - group2": {
+        "    abc": 12345,
+        "    deep": {
+            "    id": 45
+        }
+    }
+}
