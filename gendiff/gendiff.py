@@ -1,7 +1,7 @@
-from make_data import make_value
-from format.stylish import stylish
-from format.plain import plain
-from format.json_form import json_form
+from gendiff.make_data import make_value
+from gendiff.format.stylish import stylish
+from gendiff.format.plain import plain
+from gendiff.format.json_form import json_form
 
 
 FORMAT_FUNCTIONS = {'stylish': stylish, 'plain': plain, 'json': json_form}
@@ -73,17 +73,3 @@ def generate_diff(path_file1: str, path_file2: str, format='stylish') -> str:
     res = FORMAT_FUNCTIONS[format](values)
 
     return res
-
-
-p1 = 'second-project/python-project-50/tests/fixtures/file1.json'
-p2 = 'second-project/python-project-50/tests/fixtures/file2.json'
-
-# p1 = 'second-project/python-project-50/tests/fixtures/file1.yml'
-# p2 = 'second-project/python-project-50/tests/fixtures/file2.yml'
-
-res = generate_diff(p1, p2, 'json')
-
-print(res)
-
-# if __name__ == '__main__':
-#     main()
