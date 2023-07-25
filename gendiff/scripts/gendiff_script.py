@@ -18,9 +18,17 @@ def main():
 
 parser = argparse.ArgumentParser(description=TEXT_HELP)
 
-parser.add_argument('path_file1', type=str, help='Path to the first (old) file.')
-parser.add_argument('path_file2', type=str, help='Path to the second (new) file.')
-parser.add_argument('-f', '--format', dest='format', default='stylish', type=str, help='Result output format.')
+parser.add_argument('path_file1',
+                    type=str,
+                    help='Path to the first (old) file.')
+parser.add_argument('path_file2',
+                    type=str,
+                    help='Path to the second (new) file.')
+parser.add_argument('-f', '--format',
+                    dest='format',
+                    default='stylish',
+                    type=str,
+                    help='Result output format.')
 
 args = parser.parse_args()
 
