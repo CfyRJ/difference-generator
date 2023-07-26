@@ -6,7 +6,7 @@ VAL_DEFAULT = {
     PREFIX_F2: ' was added with value: ',
     'change': ' was updated. From ',
 }
-CONSTANT_CHANGE = {'False': 'false', 'True': 'true', 'None': 'null', }
+CONSTANT_CHANGE = {'False': 'false', 'True': 'true', 'None': 'null', '0': '0'}
 
 
 def make_plain(data: list) -> list:
