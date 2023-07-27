@@ -68,6 +68,9 @@ def generate_diff(path_file1: str, path_file2: str, format='stylish') -> str:
     value_old = make_value(path_file1)
     value_new = make_value(path_file2)
 
+    if value_old == value_new:
+        return ''
+
     values = get_diff(value_old, value_new)
 
     res = FORMAT_FUNCTIONS[format](values)
