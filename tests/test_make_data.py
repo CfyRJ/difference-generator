@@ -1,8 +1,6 @@
 from gendiff.make_data import make_value
 
 
-
-
 PATH_FILE_JSON = 'tests/fixtures/file1.json'
 PATH_FILE_YAML = 'tests/fixtures/file1.yml'
 CHECK = {
