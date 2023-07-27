@@ -7,7 +7,9 @@ from gendiff.gendiff import generate_diff
 
 def main():
     args = make_parser().parse_args()
-    generate_diff(args.path_file1, args.path_file2, args.format)
+    res = generate_diff(args.path_file1, args.path_file2, args.format)
+
+    print(res)
 
     return None
 
