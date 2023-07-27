@@ -86,6 +86,12 @@ def test_generate_diff_json():
     assert json.loads(res) == CHECK_JSON
 
 
+def test_generate_diff_json():
+    res = generate_diff(P1_JSON, P1_JSON,)
+
+    assert res == ''
+
+
 def test_generate_diff_yaml_stylish():
     res = generate_diff(P1_YAML, P2_YAML,)
 
