@@ -1,70 +1,69 @@
-PREFIX_F1 = '  - '
-PREFIX_F2 = '  + '
-
-VAL_DEFAULT = {
-    PREFIX_F1: ' was removed',
-    PREFIX_F2: ' was added with value: ',
+VALUES_DEFAULT = {
+    'removed': ' was removed',
+    'add': ' was added with value: ',
     'change': ' was updated. From ',
+    'change_to': ' to ',
+    'first_word': 'Property '
 }
 CONSTANT_CHANGE = {'False': 'false', 'True': 'true', 'None': 'null', '0': '0'}
+VALUE_ACCESS_KEYS = {'s': 'status', 'o': 'old_value', 'n': 'new_value'}
+HIDDEN_DICT = '[complex value]'
 
 
-def make_plain(data: list) -> list:
-    if not isinstance(data, list):
-        return 'Error type'
-
-    lenght = len(data)
+def make_plain(data: dict) -> list:
     res = []
-    i = 0
 
-    while i < lenght:
-
-        el1 = data[i]
-        n, pr, k, val = el1[0], el1[1], el1[2], el1[3]
-
-        el2 = data[i + 1] if i + 1 < lenght else False
-
-        key_ = f"{k}" if n == 0 else f".{k}"
-        val1 = '[complex value]' if isinstance(val, list) else f"'{val}'"
-
-        if el2 and k == el2[2]:
-            if isinstance(el2[3], list):
-                val2 = '[complex value]'
-            else:
-                val2 = f"'{el2[3]}'"
-
-            res.append(key_ + VAL_DEFAULT["change"] + f"{val1} to {val2}")
-            i += 2
+    for key, values in data.items():
+        if not isinstance(values, dict):
             continue
 
-        elif pr == PREFIX_F1:
-            res.append(key_ + VAL_DEFAULT[pr])
+        status_keys = values.keys()
 
-        elif pr == PREFIX_F2:
-            res.append(key_ + VAL_DEFAULT[pr] + f"{val1}")
+        if not VALUE_ACCESS_KEYS['s'] in values.keys():
+            for v in make_plain(values):
+                res += [[f"{key}."] + v]
+            continue
 
-        elif isinstance(val, list):
-            for x in make_plain(val):
-                res.append(key_ + x)
+        if not VALUE_ACCESS_KEYS['o'] in status_keys:
+            n = values[VALUE_ACCESS_KEYS['n']]
+            value = f"'{n}'" if not isinstance(n, dict) else HIDDEN_DICT
 
-        i += 1
+            res += [[key] + [VALUES_DEFAULT['add']] + [value]]
+            continue
+
+        if not VALUE_ACCESS_KEYS['n'] in status_keys:
+            o = values[VALUE_ACCESS_KEYS['o']]
+            value = f"'{o}'" if not isinstance(o, dict) else HIDDEN_DICT
+
+            res += [[key] + [VALUES_DEFAULT['removed']]]
+            continue
+
+        o = values[VALUE_ACCESS_KEYS['o']]
+        n = values[VALUE_ACCESS_KEYS['n']]
+
+        old_value = f"'{o}'" if not isinstance(o, dict) else HIDDEN_DICT
+        new_value = f"'{n}'" if not isinstance(n, dict) else HIDDEN_DICT
+
+        res += [[key]
+                + [VALUES_DEFAULT['change']]
+                + [old_value]
+                + [VALUES_DEFAULT['change_to']]
+                + [new_value]]
 
     return res
 
 
-def plain(data: list) -> str:
-    if not isinstance(data, list):
-        return 'Error type'
+def plain(data: dict) -> str:
 
-    res = make_plain(data)
+    lines = make_plain(data)
+    lines = sorted([''.join(v) for v in lines])
+    lines = list(map(lambda x:
+                     ' '.join([VALUES_DEFAULT['first_word']
+                               + f"'{x.split()[0]}'"]
+                              + x.split()[1:]),
+                     lines))
 
-    res = list(map(lambda x:
-                   ' '.join(['Property '
-                             + f"'{x.split()[0]}'"]
-                            + x.split()[1:]),
-                   res))
-
-    res = '\n'.join(res)
+    res = '\n'.join(lines)
 
     for k, v in CONSTANT_CHANGE.items():
         res = res.replace(f"'{k}'", v)
