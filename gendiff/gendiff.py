@@ -3,50 +3,48 @@ from gendiff.format.stylish import stylish
 from gendiff.format.plain import plain
 from gendiff.format.json import format_json
 
-# from make_data import make_value
-# from format.stylish import stylish
-# from format.plain import plain
-# from format.json import format_json
 
+STATUS_VALUES = {'a': 'add', 'ch': 'changed', 'r': 'removed'}
 VALUE_ACCESS_KEYS = {'s': 'status', 'o': 'old_value', 'n': 'new_value'}
+
 FORMAT_FUNCTIONS = {'stylish': stylish, 'plain': plain, 'json': format_json}
 DEFAULT_FORMAT_FUNCTIONS = 'stylish'
 
 
-def get_diff(value_old: dict, value_new: dict, nesting=0) -> dict:
-    k1 = list(value_old.keys())
-    k2 = list(value_new.keys())
-    keys = set(k1 + k2)
+def get_diff(old_data: dict, new_data: dict) -> dict:
+    old_keys = list(old_data.keys())
+    new_keys = list(new_data.keys())
+    keys = set(old_keys + new_keys)
 
-    values = {}
+    res = {}
 
-    for k in keys:
-        v1 = value_old.get(k)
-        v2 = value_new.get(k)
+    for key in keys:
+        old_value = old_data.get(key)
+        new_value = new_data.get(key)
 
-        if isinstance(v1, dict) and isinstance(v2, dict):
-            values[k] = get_diff(v1, v2)
+        if isinstance(old_value, dict) and isinstance(new_value, dict):
+            res[key] = get_diff(old_value, new_value)
             continue
 
-        if k in k1 and k not in k2:
-            values[k] = {VALUE_ACCESS_KEYS['s']: 'removed',
-                         VALUE_ACCESS_KEYS['o']: v1}
+        if key in old_keys and key not in new_keys:
+            res[key] = {VALUE_ACCESS_KEYS['s']: STATUS_VALUES['r'],
+                        VALUE_ACCESS_KEYS['o']: old_value}
             continue
 
-        if k not in k1 and k in k2:
-            values[k] = {VALUE_ACCESS_KEYS['s']: 'add',
-                         VALUE_ACCESS_KEYS['n']: v2}
+        if key not in old_keys and key in new_keys:
+            res[key] = {VALUE_ACCESS_KEYS['s']: STATUS_VALUES['a'],
+                        VALUE_ACCESS_KEYS['n']: new_value}
             continue
 
-        if v1 == v2:
-            values[k] = v1
+        if old_value == new_value:
+            res[key] = old_value
             continue
 
-        values[k] = {VALUE_ACCESS_KEYS['s']: 'changed',
-                     VALUE_ACCESS_KEYS['o']: v1,
-                     VALUE_ACCESS_KEYS['n']: v2}
+        res[key] = {VALUE_ACCESS_KEYS['s']: STATUS_VALUES['ch'],
+                    VALUE_ACCESS_KEYS['o']: old_value,
+                    VALUE_ACCESS_KEYS['n']: new_value}
 
-    return values
+    return res
 
 
 def generate_diff(path_file1: str,
@@ -54,13 +52,13 @@ def generate_diff(path_file1: str,
                   format=DEFAULT_FORMAT_FUNCTIONS
                   ) -> str:
 
-    value_old = make_value(path_file1)
-    value_new = make_value(path_file2)
+    old_data = make_value(path_file1)
+    new_data = make_value(path_file2)
 
-    if value_old == value_new:
+    if old_data == new_data:
         return ''
 
-    values = get_diff(value_old, value_new)
+    values = get_diff(old_data, new_data)
 
     res = FORMAT_FUNCTIONS[format](values)
 
@@ -72,18 +70,13 @@ if __name__ == '__main__':
     p1 = 'second-project/python-project-50/tests/fixtures/file1.json'
     p2 = 'second-project/python-project-50/tests/fixtures/file2.json'
 
-    value_old = make_value(p1)
-    value_new = make_value(p2)
+    res_diff = get_diff(old_data, new_data)
 
-    # res = get_diff(value_old, value_new)
+    res_st = generate_diff(p1, p2, 'stylish')
+    res_pl = generate_diff(p1, p2, 'plain')
+    res_js = generate_diff(p1, p2, 'json')
 
-    # print(res)
-
-    # res = stylish(res)
-    # res = plain(res)
-    # res = format_json(res)
-
-    # print(*res, sep='\n\n')
-    # print(*res, sep='\n')
-    res = generate_diff(p1, p2, 'json')
-    print(res)
+    print(res_diff)
+    print(res_st)
+    print(res_pl)
+    print(res_js)
