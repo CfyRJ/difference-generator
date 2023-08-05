@@ -1,11 +1,11 @@
-INDENT = '    '
+VALUE_ACCESS_KEYS = {'s': 'status', 'o': 'old_value', 'n': 'new_value'}
 
 START_RES = '{'
 END_RES = '}'
-
 CONSTANT_CHANGE = {'False': 'false', 'True': 'true', 'None': 'null'}
-VALUE_ACCESS_KEYS = {'s': 'status', 'o': 'old_value', 'n': 'new_value'}
-PREFIXES = {VALUE_ACCESS_KEYS['o']: '  - ', VALUE_ACCESS_KEYS['n']: '  + ', }
+PREFIXES = {VALUE_ACCESS_KEYS['o']: '  - ',
+            VALUE_ACCESS_KEYS['n']: '  + ',
+            'indent': '    ', }
 
 
 def flatten(data: list) -> list:
@@ -34,8 +34,8 @@ def make_data(data: dict, nesting=0) -> list:
     for key, value in data.items():
         values = ''
         if not isinstance(value, dict):
-            res.append([nesting * INDENT,
-                        INDENT,
+            res.append([nesting * PREFIXES['indent'],
+                        PREFIXES['indent'],
                         key,
                         f': {value}',
                         values])
@@ -43,52 +43,52 @@ def make_data(data: dict, nesting=0) -> list:
 
         if not value.get(VALUE_ACCESS_KEYS['s']):
             values = make_data(value, nesting + 1)
-            res.append([nesting * INDENT,
-                        INDENT,
+            res.append([nesting * PREFIXES['indent'],
+                        PREFIXES['indent'],
                         key,
                         f': {START_RES}',
                         values])
             continue
 
-        for status_key, prefix_value in PREFIXES.items():
+        for prefix_key, prefix_value in PREFIXES.items():
             values = ''
-            if status_key not in value.keys():
+            if prefix_key not in value.keys():
                 continue
 
-            status_value = value[status_key]
+            initial_value = value[prefix_key]
 
-            if isinstance(status_value, dict):
-                values = make_data(status_value, nesting + 1)
-                res.append([nesting * INDENT,
+            if isinstance(initial_value, dict):
+                values = make_data(initial_value, nesting + 1)
+                res.append([nesting * PREFIXES['indent'],
                             prefix_value,
                             key,
                             f': {START_RES}',
                             values])
             else:
-                res.append([nesting * INDENT,
+                res.append([nesting * PREFIXES['indent'],
                             prefix_value,
                             key,
-                            f': {status_value}',
+                            f': {initial_value}',
                             values])
 
     res.sort(key=lambda x: x[2])
 
-    res.append([nesting * INDENT,
+    res.append([nesting * PREFIXES['indent'],
                 END_RES])
 
     return res
 
 
 def stylish(data: dict) -> str:
-    res = []
-    tmp_data = make_data(data)
+    lines = []
+    processed_data = make_data(data)
 
-    for d in tmp_data:
-        res += flatten(d)
+    for v in processed_data:
+        lines += flatten(v)
 
-    res = '\n'.join((START_RES, *res))
+    res = '\n'.join((START_RES, *lines))
 
-    for k, v in CONSTANT_CHANGE.items():
-        res = res.replace(k, v)
+    for key, value in CONSTANT_CHANGE.items():
+        res = res.replace(key, value)
 
     return res
