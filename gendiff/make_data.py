@@ -1,34 +1,38 @@
 import json
 import yaml
+from os.path import splitext
 
 
 def make_value(path: str) -> dict:
-    if path.split('.')[-1] == 'json':
-        return make_value_json(path)
-    elif path.split('.')[-1] in ('yml', 'yaml'):
-        return make_value_yaml(path)
+    data = read_data(path)
+    _, extension = splitext(path)
+
+    if extension == '.json':
+        return parse_json(data)
+    elif extension in ('.yml', '.yaml'):
+        return parse_yaml(data)
 
 
-def make_value_json(path: str) -> dict:
-    value = json.load(open(path))
-
-    return value if isinstance(value, dict) else {}
-
-
-def make_value_yaml(path: str) -> dict:
+def read_data(path: str) -> str:
     with open(path) as f:
-        value = yaml.load(f, Loader=yaml.SafeLoader)
-
-    return value if isinstance(value, dict) else {}
+        return f.read()
 
 
-# p1 = 'second-project/python-project-50/tests/fixtures/file1.json'
-# p2 = 'second-project/python-project-50/tests/fixtures/file2.json'
+def parse_json(data: str) -> dict:
+    res = json.loads(data)
 
-# p1 = 'second-project/python-project-50/tests/fixtures/file1.yml'
-# p2 = 'second-project/python-project-50/tests/fixtures/file2.yml'
+    return res if isinstance(res, dict) else {}
 
-# print(make_value_yaml(p1))
 
-# if __name__ == '__main__':
-#     main()
+def parse_yaml(data: str) -> dict:
+    res = yaml.load(data, Loader=yaml.SafeLoader)
+
+    return res if isinstance(res, dict) else {}
+
+
+if __name__ == '__main__':
+
+    p1 = 'second-project/python-project-50/tests/fixtures/file1.json'
+    res = make_value(p1)
+    print(res)
+    print(type(res))
