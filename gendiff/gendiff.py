@@ -70,6 +70,9 @@ if __name__ == '__main__':
     p1 = 'second-project/python-project-50/tests/fixtures/file1.json'
     p2 = 'second-project/python-project-50/tests/fixtures/file2.json'
 
+    old_data = make_value(p1)
+    new_data = make_value(p2)
+
     res_diff = get_diff(old_data, new_data)
 
     res_st = generate_diff(p1, p2, 'stylish')
