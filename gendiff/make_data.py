@@ -5,12 +5,13 @@ from os.path import splitext
 
 def make_value(path: str) -> dict:
     data = read_data(path)
+    extensions = {'.json': parse_json,
+                  '.yml': parse_yaml,
+                  '.yaml': parse_yaml,
+                  }
     _, extension = splitext(path)
 
-    if extension == '.json':
-        return parse_json(data)
-    elif extension in ('.yml', '.yaml'):
-        return parse_yaml(data)
+    return extensions[extension](data)
 
 
 def read_data(path: str) -> str:
