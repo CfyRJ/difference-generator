@@ -1,14 +1,47 @@
-STATUS_VALUES = {'a': 'add', 'ch': 'changed', 'r': 'removed'}
-VALUE_ACCESS_KEYS = {'s': 'status', 'o': 'old_value', 'n': 'new_value'}
+# String constants for handling differences.
+ADD = 'add'
+CHANGED = 'changed'
+REMOVED = 'removed'
+STATUS = 'status'
+OLD_VALUE = 'old_value'
+NEW_VALUE = 'new_value'
+FIRST_WORD = 'Property '
 
-VALUES_DEFAULT = {
-    STATUS_VALUES['r']: ' was removed',
-    STATUS_VALUES['a']: ' was added with value: ',
-    STATUS_VALUES['ch']: (' was updated. From ', ' to '),
-    'first_word': 'Property '
-}
+# String constants for formatting the difference result.
+ADDED_KEY = ' was added with value: '
+CHANGED_KEY = (' was updated. From ', ' to ')
+REMOVED_KEY = ' was removed'
+
 CONSTANT_CHANGE = {'False': 'false', 'True': 'true', 'None': 'null', '0': '0'}
 HIDDEN_DICT = '[complex value]'
+
+
+def get_value_right_format(value) -> str:
+    return (HIDDEN_DICT
+            if isinstance(value, dict)
+            else f"'{value}'")
+
+
+def get_lines(key, values):
+    value_keys = values.keys()
+
+    if OLD_VALUE not in value_keys:
+        new_value = values[NEW_VALUE]
+        value = get_value_right_format(new_value)
+
+        res = [[key] + [ADDED_KEY] + [value]]
+    elif NEW_VALUE not in value_keys:
+        res = [[key] + [REMOVED_KEY]]
+    else:
+        old_value = get_value_right_format(values[OLD_VALUE])
+        new_value = get_value_right_format(values[NEW_VALUE])
+
+        res = [[key]
+               + [CHANGED_KEY[0]]
+               + [old_value]
+               + [CHANGED_KEY[1]]
+               + [new_value]]
+    return res
 
 
 def make_plain(data: dict) -> list:
@@ -20,44 +53,12 @@ def make_plain(data: dict) -> list:
 
         value_keys = values.keys()
 
-        if not VALUE_ACCESS_KEYS['s'] in values.keys():
+        if STATUS not in value_keys:
             for value in make_plain(values):
                 res += [[f"{key}."] + value]
             continue
 
-        if not VALUE_ACCESS_KEYS['o'] in value_keys:
-            new_value = values[VALUE_ACCESS_KEYS['n']]
-            if isinstance(new_value, dict):
-                value = HIDDEN_DICT
-            else:
-                value = f"'{new_value}'"
-
-            res += [[key]
-                    + [VALUES_DEFAULT[values[VALUE_ACCESS_KEYS['s']]]]
-                    + [value]]
-            continue
-
-        if not VALUE_ACCESS_KEYS['n'] in value_keys:
-            res += [[key] + [VALUES_DEFAULT[values[VALUE_ACCESS_KEYS['s']]]]]
-            continue
-
-        old_value = values[VALUE_ACCESS_KEYS['o']]
-        new_value = values[VALUE_ACCESS_KEYS['n']]
-
-        if isinstance(old_value, dict):
-            old_value = HIDDEN_DICT
-        else:
-            old_value = f"'{old_value}'"
-        if isinstance(new_value, dict):
-            new_value = HIDDEN_DICT
-        else:
-            new_value = f"'{new_value}'"
-
-        res += [[key]
-                + [VALUES_DEFAULT[values[VALUE_ACCESS_KEYS['s']]][0]]
-                + [old_value]
-                + [VALUES_DEFAULT[values[VALUE_ACCESS_KEYS['s']]][1]]
-                + [new_value]]
+        res += get_lines(key, values)
 
     return res
 
@@ -67,7 +68,7 @@ def plain(data: dict) -> str:
     processed_data = make_plain(data)
     lines = sorted([''.join(v) for v in processed_data])
     lines = list(map(lambda x:
-                     ' '.join([VALUES_DEFAULT['first_word']
+                     ' '.join([FIRST_WORD
                                + f"'{x.split()[0]}'"]
                               + x.split()[1:]),
                      lines))
