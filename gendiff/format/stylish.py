@@ -1,11 +1,14 @@
-VALUE_ACCESS_KEYS = {'s': 'status', 'o': 'old_value', 'n': 'new_value'}
+STATUS = 'status'
+OLD_VALUE = 'old_value'
+NEW_VALUE = 'new_value'
 
 START_RES = '{'
 END_RES = '}'
+INDENT = '    '
 CONSTANT_CHANGE = {'False': 'false', 'True': 'true', 'None': 'null'}
-PREFIXES = {VALUE_ACCESS_KEYS['o']: '  - ',
-            VALUE_ACCESS_KEYS['n']: '  + ',
-            'indent': '    ', }
+PREFIXES = {OLD_VALUE: '  - ',
+            NEW_VALUE: '  + ',
+            }
 
 
 def flatten(data: list) -> list:
@@ -34,46 +37,46 @@ def make_data(data: dict, nesting=0) -> list:
     for key, value in data.items():
         values = ''
         if not isinstance(value, dict):
-            res.append([nesting * PREFIXES['indent'],
-                        PREFIXES['indent'],
+            res.append([nesting * INDENT,
+                        INDENT,
                         key,
                         f': {value}',
                         values])
             continue
-
-        if not value.get(VALUE_ACCESS_KEYS['s']):
+        elif not value.get(STATUS):
             values = make_data(value, nesting + 1)
-            res.append([nesting * PREFIXES['indent'],
-                        PREFIXES['indent'],
+            res.append([nesting * INDENT,
+                        INDENT,
                         key,
                         f': {START_RES}',
                         values])
             continue
 
-        for prefix_key, prefix_value in PREFIXES.items():
+        status_keys = list(value.keys())
+        status_keys.remove('status')
+
+        for s_key in status_keys:
             values = ''
-            if prefix_key not in value.keys():
-                continue
+            prefix_value = PREFIXES[s_key]
+            meaning_value = value[s_key]
 
-            initial_value = value[prefix_key]
-
-            if isinstance(initial_value, dict):
-                values = make_data(initial_value, nesting + 1)
-                res.append([nesting * PREFIXES['indent'],
+            if isinstance(meaning_value, dict):
+                values = make_data(meaning_value, nesting + 1)
+                res.append([nesting * INDENT,
                             prefix_value,
                             key,
                             f': {START_RES}',
                             values])
             else:
-                res.append([nesting * PREFIXES['indent'],
+                res.append([nesting * INDENT,
                             prefix_value,
                             key,
-                            f': {initial_value}',
+                            f': {meaning_value}',
                             values])
 
     res.sort(key=lambda x: x[2])
 
-    res.append([nesting * PREFIXES['indent'],
+    res.append([nesting * INDENT,
                 END_RES])
 
     return res
