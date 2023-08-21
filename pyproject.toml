@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hexlet-code"
-version = "0.3.0"
+version = "0.3.1"
 description = "Shows the difference between two files."
 authors = ["Alex Kositskiy <koso-96@mail.ru>"]
 license = "Aladdin Free Public License (AFPL)"
