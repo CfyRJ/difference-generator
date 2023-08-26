@@ -1,6 +1,6 @@
 from gendiff.make_data import make_value
-from gendiff.format.stylish import stylish
-from gendiff.format.plain import plain
+from gendiff.format.stylish import make_stylish
+from gendiff.format.plain import make_plain
 from gendiff.format.json import format_json
 
 
@@ -12,7 +12,10 @@ STATUS = 'status'
 OLD_VALUE = 'old_value'
 NEW_VALUE = 'new_value'
 
-FORMAT_FUNCTIONS = {'stylish': stylish, 'plain': plain, 'json': format_json}
+FORMAT_FUNCTIONS = {'stylish': make_stylish,
+                    'plain': make_plain,
+                    'json': format_json,
+                    }
 DEFAULT_FORMAT_FUNCTIONS = 'stylish'
 
 
