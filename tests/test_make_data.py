@@ -16,7 +16,7 @@ CHECK = {
         }
     },
     "group1": {
-        "baz": "bas",
+        "baz": 0,
         "foo": "bar",
         "nest": {
             "key": "value"
