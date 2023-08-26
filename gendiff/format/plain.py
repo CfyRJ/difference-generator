@@ -7,12 +7,13 @@ def replace_value(value):
     replacement_constants = {False: 'false',
                              True: 'true',
                              None: 'null',
-                             '0': '0',
                              }
     hidden_dict = '[complex value]'
 
     if isinstance(value, dict):
         res = hidden_dict
+    elif type(value) == int and value == 0:
+        res = f'{value}'
     else:
         res = (replacement_constants[value]
                if value in replacement_constants.keys()
