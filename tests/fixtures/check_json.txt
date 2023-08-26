@@ -42,7 +42,7 @@
     "group1": {
         "baz": {
             "new_value": "bars",
-            "old_value": "bas",
+            "old_value": 0,
             "status": "changed"
         },
         "foo": "bar",
