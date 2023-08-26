@@ -29,11 +29,3 @@ def parse_yaml(data: str) -> dict:
     res = yaml.load(data, Loader=yaml.SafeLoader)
 
     return res if isinstance(res, dict) else {}
-
-
-if __name__ == '__main__':
-
-    p1 = 'second-project/python-project-50/tests/fixtures/file1.json'
-    res = make_value(p1)
-    print(res)
-    print(type(res))
