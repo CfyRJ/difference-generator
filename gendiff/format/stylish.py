@@ -36,7 +36,10 @@ def flatten(data: list) -> list:
 
 
 def replace_value(value):
-    replacement_constants = {False: 'false', True: 'true', None: 'null', '0': '0'}
+    replacement_constants = {False: 'false',
+                             True: 'true',
+                             None: 'null',
+                             }
     if type(value) == int and value == 0:
         return value
 
