@@ -1,67 +1,57 @@
 STATUS = 'status'
-OLD_VALUE = 'old_value'
-NEW_VALUE = 'new_value'
+VALUE = 'value'
 
 
 def replace_value(value):
-    replacement_constants = {False: 'false',
-                             True: 'true',
-                             None: 'null',
-                             }
-    hidden_dict = '[complex value]'
-
     if isinstance(value, dict):
-        res = hidden_dict
-    elif type(value) == int and value == 0:
-        res = f'{value}'
-    else:
-        res = (replacement_constants[value]
-               if value in replacement_constants.keys()
-               else f"'{value}'")
+        return '[complex value]'
 
-    return res
+    elif isinstance(value, bool):
+        return 'true' if value else 'false'
+
+    elif value is None:
+        return 'null'
+
+    elif value == 0:
+        return f'{value}'
+
+    return f"'{value}'"
 
 
-def formats_data(data: dict, first_word="Property '") -> list:
+def make_lines(data: dict, path=[]) -> list:
     res = []
 
     for key, values in data.items():
-        flag = isinstance(values, dict)
+        path += [key]
 
-        if flag and STATUS not in values.keys():
-            res += [[first_word]
-                    + [f"{key}."]
-                    + value for value in formats_data(values, '')
-                    ]
+        if values[STATUS] == 'nested':
+            res += [value for value in make_lines(values[VALUE], path)]
 
-        elif flag and values[STATUS] == 'add':
-            value = replace_value(values[NEW_VALUE])
-            res += [[first_word]
-                    + [key]
-                    + ["' was added with value: "]
-                    + [value]
-                    ]
+        elif values[STATUS] == 'add':
+            value = replace_value(values[VALUE])
+            res += [f"Property '{'.'.join(path)}'"
+                    + f" was added with value: {value}"]
 
-        elif flag and values[STATUS] == 'removed':
-            res += [[first_word] + [key] + ["' was removed"]]
+        elif values[STATUS] == 'removed':
+            res += [f"Property '{'.'.join(path)}' was removed"]
 
-        elif flag and values[STATUS] == 'changed':
-            old_value = replace_value(values[OLD_VALUE])
-            new_value = replace_value(values[NEW_VALUE])
+        elif values[STATUS] == 'changed':
+            old_value = replace_value(values['old_value'])
+            new_value = replace_value(values['new_value'])
+            res += [f"Property '{'.'.join(path)}'"
+                    + f" was updated. From {old_value} to {new_value}"]
 
-            res += [[first_word] + [key]
-                    + ["' was updated. From "]
-                    + [old_value]
-                    + [' to ']
-                    + [new_value]
-                    ]
+        path.pop()
 
     return res
 
 
 def make_plain(data: dict) -> str:
-    processed_data = formats_data(data)
-    lines = sorted([''.join(v) for v in processed_data])
+    lines = make_lines(data)
+
+    # If dictionary sorting is broken.
+    lines = sorted([''.join(v) for v in lines])
+
     res = '\n'.join(lines)
 
     return res
