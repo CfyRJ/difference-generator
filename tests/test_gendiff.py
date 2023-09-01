@@ -11,7 +11,7 @@ P1_YAML = 'tests/fixtures/file1.yml'
 P2_YAML = 'tests/fixtures/file2.yml'
 
 with open('tests/fixtures/check_stylish.txt') as f:
-    RES_STYLISH =  f.read()
+    RES_STYLISH = f.read()
 
 with open('tests/fixtures/check_plain.txt') as f:
     RES_PLAIN = f.read()
