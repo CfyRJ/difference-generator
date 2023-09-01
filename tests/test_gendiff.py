@@ -10,62 +10,27 @@ P2_JSON = 'tests/fixtures/file2.json'
 P1_YAML = 'tests/fixtures/file1.yml'
 P2_YAML = 'tests/fixtures/file2.yml'
 
+with open('tests/fixtures/check_stylish.txt') as f:
+    RES_STYLISH =  f.read()
 
-@pytest.fixture
-def check_stylish():
-    with open('tests/fixtures/check_stylish.txt') as f:
-        return f.read()
+with open('tests/fixtures/check_plain.txt') as f:
+    RES_PLAIN = f.read()
 
+with open('tests/fixtures/check_json.txt') as f:
+    RES_JSON = f.read()
 
-@pytest.fixture
-def check_plain():
-    with open('tests/fixtures/check_plain.txt') as f:
-        return f.read()
-
-
-@pytest.fixture
-def check_json():
-    with open('tests/fixtures/check_json.txt') as f:
-        return f.read()
-
-
-def test_generate_diff_stylish(check_stylish):
-    res = generate_diff(P1_JSON, P2_JSON,)
-
-    assert res == check_stylish
+OPTIONS = [(P1_JSON, P2_JSON, 'stylish', RES_STYLISH),
+           (P1_JSON, P2_JSON, 'plain', RES_PLAIN),
+           (P1_JSON, P2_JSON, 'json', RES_JSON),
+           (P1_YAML, P2_YAML, 'stylish', RES_STYLISH),
+           (P1_YAML, P2_YAML, 'plain', RES_PLAIN),
+           (P1_YAML, P2_YAML, 'json', RES_JSON),
+           (P1_JSON, P1_JSON, 'stylish', ''),
+           ]
 
 
-def test_generate_diff_plain(check_plain):
-    res = generate_diff(P1_JSON, P2_JSON, 'plain')
+@pytest.mark.parametrize("path1, path2, format, res_comparison", OPTIONS)
+def test_generate_diff(path1, path2, format, res_comparison):
+    res = generate_diff(path1, path2, format)
 
-    assert res == check_plain
-
-
-def test_generate_diff_json(check_json):
-    res = generate_diff(P1_JSON, P2_JSON, 'json')
-
-    assert res == check_json
-
-
-def test_generate_diff_identical():
-    res = generate_diff(P1_JSON, P1_JSON)
-
-    assert res == ''
-
-
-def test_generate_diff_yaml_stylish(check_stylish):
-    res = generate_diff(P1_YAML, P2_YAML,)
-
-    assert res == check_stylish
-
-
-def test_generate_diff_yaml_plain(check_plain):
-    res = generate_diff(P1_YAML, P2_YAML, 'plain')
-
-    assert res == check_plain
-
-
-def test_generate_diff_yaml_json(check_json):
-    res = generate_diff(P1_YAML, P2_YAML, 'json')
-
-    assert res == check_json
+    assert res == res_comparison
