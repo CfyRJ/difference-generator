@@ -4,13 +4,8 @@ from gendiff.format.plain import make_plain
 from gendiff.format.json import format_json
 
 
-# String constants for formatting the difference result.
-ADD = 'add'
-CHANGED = 'changed'
-REMOVED = 'removed'
 STATUS = 'status'
-OLD_VALUE = 'old_value'
-NEW_VALUE = 'new_value'
+VALUE = 'value'
 
 FORMAT_FUNCTIONS = {'stylish': make_stylish,
                     'plain': make_plain,
@@ -20,33 +15,41 @@ DEFAULT_FORMAT_FUNCTIONS = 'stylish'
 
 
 def get_diff(old_data: dict, new_data: dict) -> dict:
+    '''
+    Creates a new dictionary of differences between two dictionaries.
+    Each key has a status field with key
+    (add, removed, changed, unchanged, nested).
+    '''
     old_keys = list(old_data.keys())
     new_keys = list(new_data.keys())
     keys = set(old_keys + new_keys)
 
     res = {}
 
-    for key in keys:
+    for key in sorted(keys):
         old_value = old_data.get(key)
         new_value = new_data.get(key)
 
         if isinstance(old_value, dict) and isinstance(new_value, dict):
-            res[key] = get_diff(old_value, new_value)
+            res[key] = {STATUS: 'nested',
+                        VALUE: get_diff(old_value, new_value)
+                        }
 
         elif key in old_keys and key not in new_keys:
-            res[key] = {STATUS: REMOVED,
-                        OLD_VALUE: old_value}
+            res[key] = {STATUS: 'removed',
+                        VALUE: old_value}
 
         elif key not in old_keys and key in new_keys:
-            res[key] = {STATUS: ADD,
-                        NEW_VALUE: new_value}
+            res[key] = {STATUS: 'add',
+                        VALUE: new_value}
 
         elif old_value == new_value:
-            res[key] = old_value
+            res[key] = {STATUS: 'unchanged', VALUE: old_value}
+
         else:
-            res[key] = {STATUS: CHANGED,
-                        OLD_VALUE: old_value,
-                        NEW_VALUE: new_value}
+            res[key] = {STATUS: 'changed',
+                        'old_value': old_value,
+                        'new_value': new_value}
 
     return res
 
