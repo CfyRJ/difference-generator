@@ -1,114 +1,66 @@
 STATUS = 'status'
-OLD_VALUE = 'old_value'
-NEW_VALUE = 'new_value'
+VALUE = 'value'
 
 BLOCK_START = '{'
 BLOCK_END = '}'
 INDENT = '    '
+EMPTY_PREFIX = '  '
+NEW_PREFIX = '+ '
+OLD_PREFIX = '- '
 
-STATUSES = {'add': (NEW_VALUE, ),
-            'changed': (OLD_VALUE, NEW_VALUE),
-            'removed': (OLD_VALUE, ),
+STATUSES = {'add': ((VALUE, NEW_PREFIX), ),
+            'removed': ((VALUE, OLD_PREFIX), ),
+            'changed': (('old_value', OLD_PREFIX), ('new_value', NEW_PREFIX)),
+            'nested': ((VALUE, EMPTY_PREFIX), ),
+            'unchanged': ((VALUE, EMPTY_PREFIX), ),
             }
-PREFIXES = {OLD_VALUE: '- ',
-            NEW_VALUE: '+ ',
-            }
-
-
-def flatten(data: list) -> list:
-    '''
-    Converts a multi-nested list to a single-nested list.
-    In the original list, the nesting must be in the last element.
-    '''
-    res = []
-    head, tail = data[:-1], data[-1]
-
-    if isinstance(tail, list):
-        res += [''.join(head)]
-
-        for element in tail:
-            if isinstance(element, list):
-                res += flatten(element)
-    else:
-        res += [''.join(data)]
-
-    return res
 
 
 def replace_value(value):
-    replacement_constants = {False: 'false',
-                             True: 'true',
-                             None: 'null',
-                             }
-    if type(value) == int and value == 0:
-        return value
 
-    return (replacement_constants[value]
-            if value in replacement_constants.keys()
-            else value)
+    if isinstance(value, bool):
+        return 'true' if value else 'false'
+
+    elif value is None:
+        return 'null'
+
+    return value
 
 
 def formats_data(data: dict, nesting=0) -> list:
     res = []
 
-    for key, value in data.items():
-        values = ''
+    # If dictionary sorting is broken.
+    for key, value in sorted(data.items(), key=lambda x: x[0]):
         prefix = (nesting + 1) * INDENT
 
         if not isinstance(value, dict):
-            res.append([prefix,
-                        key,
-                        f': {replace_value(value)}',
-                        ]
-                       )
+            res += [f'{prefix}{key}: {replace_value(value)}']
             continue
 
-        elif not value.get(STATUS):
+        if not value.get(STATUS):
             values = formats_data(value, nesting + 1)
-            res.append([prefix,
-                        key,
-                        f': {BLOCK_START}',
-                        values,
-                        ]
-                       )
+            res += [f'{prefix}{key}: {BLOCK_START}'] + values
             continue
 
-        for status_values in STATUSES[value[STATUS]]:
-            values = ['']
-            prefix = (nesting + 1) * INDENT + PREFIXES[status_values]
-            prefix = prefix[2:]
-            meaning_value = value[status_values]
+        for value_key, prefix_end in STATUSES[value[STATUS]]:
+            values = value[value_key]
+            prefix = (nesting + 1) * INDENT + prefix_end
 
-            if isinstance(meaning_value, dict):
-                values = formats_data(meaning_value, nesting + 1)
-                meaning_value = BLOCK_START
+            if isinstance(values, dict):
+                values = formats_data(values, nesting + 1)
+                res += [f'{prefix[2:]}{key}: {BLOCK_START}'] + values
             else:
-                meaning_value = replace_value(meaning_value)
-
-            res.append([prefix,
-                        key,
-                        f': {meaning_value}',
-                        values,
-                        ]
-                       )
-
-    res.sort(key=lambda x: x[1])
+                res += [f'{prefix[2:]}{key}: {replace_value(values)}']
 
     prefix = nesting * INDENT
-    res.append([prefix,
-                BLOCK_END,
-                ]
-               )
+    res += [f'{prefix}{BLOCK_END}']
 
     return res
 
 
 def make_stylish(data: dict) -> str:
-    lines = []
-    formatted_data = formats_data(data)
-
-    for v in formatted_data:
-        lines += flatten(v)
+    lines = formats_data(data)
 
     res = '\n'.join((BLOCK_START, *lines))
 
