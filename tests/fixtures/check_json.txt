@@ -1,77 +1,98 @@
 {
     "common": {
-        "follow": {
-            "new_value": false,
-            "status": "add"
-        },
-        "setting1": "Value 1",
-        "setting2": {
-            "old_value": 200,
-            "status": "removed"
-        },
-        "setting3": {
-            "new_value": null,
-            "old_value": true,
-            "status": "changed"
-        },
-        "setting4": {
-            "new_value": "blah blah",
-            "status": "add"
-        },
-        "setting5": {
-            "new_value": {
-                "key5": "value5"
+        "status": "nested",
+        "value": {
+            "follow": {
+                "status": "add",
+                "value": false
             },
-            "status": "add"
-        },
-        "setting6": {
-            "doge": {
-                "wow": {
-                    "new_value": "so much",
-                    "old_value": "",
-                    "status": "changed"
+            "setting1": {
+                "status": "unchanged",
+                "value": "Value 1"
+            },
+            "setting2": {
+                "status": "removed",
+                "value": 200
+            },
+            "setting3": {
+                "new_value": null,
+                "old_value": true,
+                "status": "changed"
+            },
+            "setting4": {
+                "status": "add",
+                "value": "blah blah"
+            },
+            "setting5": {
+                "status": "add",
+                "value": {
+                    "key5": "value5"
                 }
             },
-            "key": "value",
-            "ops": {
-                "new_value": "vops",
-                "status": "add"
+            "setting6": {
+                "status": "nested",
+                "value": {
+                    "doge": {
+                        "status": "nested",
+                        "value": {
+                            "wow": {
+                                "new_value": "so much",
+                                "old_value": "",
+                                "status": "changed"
+                            }
+                        }
+                    },
+                    "key": {
+                        "status": "unchanged",
+                        "value": "value"
+                    },
+                    "ops": {
+                        "status": "add",
+                        "value": "vops"
+                    }
+                }
             }
         }
     },
     "group1": {
-        "baz": {
-            "new_value": "bars",
-            "old_value": 0,
-            "status": "changed"
-        },
-        "foo": "bar",
-        "nest": {
-            "new_value": "str",
-            "old_value": {
-                "key": "value"
+        "status": "nested",
+        "value": {
+            "baz": {
+                "new_value": "bars",
+                "old_value": 0,
+                "status": "changed"
             },
-            "status": "changed"
+            "foo": {
+                "status": "unchanged",
+                "value": "bar"
+            },
+            "nest": {
+                "new_value": "str",
+                "old_value": {
+                    "key": "value"
+                },
+                "status": "changed"
+            }
         }
     },
     "group2": {
-        "old_value": {
+        "status": "removed",
+        "value": {
             "abc": 12345,
             "deep": {
                 "id": 45
             }
-        },
-        "status": "removed"
+        }
     },
     "group3": {
-        "new_value": {
+        "status": "add",
+        "value": {
             "deep": {
                 "id": {
                     "number": 45
                 }
             },
             "fee": 100500
-        },
-        "status": "add"
+        }
     }
 }
