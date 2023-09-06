@@ -12,8 +12,8 @@ def replace_value(value):
     elif value is None:
         return 'null'
 
-    # elif value == 0:
-    #     return f'{value}'
+    elif isinstance(value, int):
+        return f'{value}'
 
     return f"'{value}'"
 
