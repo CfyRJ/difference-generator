@@ -2,7 +2,7 @@ STATUS = 'status'
 VALUE = 'value'
 
 
-def replace_value(value):
+def format_value(value):
     if isinstance(value, dict):
         return '[complex value]'
 
@@ -28,7 +28,7 @@ def make_lines(data: dict, path=[]) -> list:
             res += [value for value in make_lines(values[VALUE], path)]
 
         elif values[STATUS] == 'add':
-            value = replace_value(values[VALUE])
+            value = format_value(values[VALUE])
             res += [f"Property '{'.'.join(path)}'"
                     + f" was added with value: {value}"]
 
@@ -36,8 +36,8 @@ def make_lines(data: dict, path=[]) -> list:
             res += [f"Property '{'.'.join(path)}' was removed"]
 
         elif values[STATUS] == 'changed':
-            old_value = replace_value(values['old_value'])
-            new_value = replace_value(values['new_value'])
+            old_value = format_value(values['old_value'])
+            new_value = format_value(values['new_value'])
             res += [f"Property '{'.'.join(path)}'"
                     + f" was updated. From {old_value} to {new_value}"]
 
