@@ -9,73 +9,73 @@ OLD_PREFIX = '- '
 OFFSET = len(NEW_PREFIX)
 
 
-def formats_value(value, nesting=0):
-    res = value
+def format_value(value, nesting=0):
+    # res = value
 
-    if isinstance(res, bool):
-        return 'true' if value else 'false'
+    if isinstance(value, bool):
+        value = 'true' if value else 'false'
 
-    elif res is None:
-        res = 'null'
-    
-    elif isinstance(res, int):
-        res = f'{res}'
+    elif value is None:
+        value = 'null'
 
-    elif isinstance(res, dict):
+    elif isinstance(value, int):
+        value = f'{value}'
+
+    elif isinstance(value, dict):
         res = f'{BLOCK_START}'
 
         for key, value_ in value.items():
-            values = formats_value(value_, nesting + 1)
-            res += f'\n{(nesting + 1) * INDENT}{key}: {values}'
+            res += f'\n{(nesting + 1) * INDENT}{key}: ' \
+                + format_value(value_, nesting + 1)
 
         res += f'\n{nesting * INDENT}{BLOCK_END}'
+        value = res
 
-    return res
+    return value
 
 
-def statuses(key, value, nesting):
+def make_line(key, value, nesting):
     res = ''
     prefix = (nesting + 1) * INDENT
 
     if value[STATUS] == 'nested':
-        values = formats_data(value[VALUE], nesting + 1)
-        res += f'\n{prefix}{key}: {BLOCK_START}'
-        res += values
-        res += f'\n{prefix}{BLOCK_END}'
+        res += f'\n{prefix}{key}: {BLOCK_START}' \
+            + format_data(value[VALUE], nesting + 1) \
+            + f'\n{prefix}{BLOCK_END}'
 
     elif value[STATUS] == 'unchanged':
-        values = formats_value(value[VALUE], nesting+1)
-        res += f'\n{prefix}{key}: ' + values
+        res += f'\n{prefix}{key}: ' \
+            + format_value(value[VALUE], nesting + 1)
 
     elif value[STATUS] == 'add':
-        values = formats_value(value[VALUE], nesting+1)
-        res += f'\n{prefix[OFFSET:]}{NEW_PREFIX}{key}: ' + values
+        res += f'\n{prefix[OFFSET:]}{NEW_PREFIX}{key}: ' \
+            + format_value(value[VALUE], nesting + 1)
 
     elif value[STATUS] == 'removed':
-        values = formats_value(value[VALUE], nesting+1)
-        res += f'\n{prefix[OFFSET:]}{OLD_PREFIX}{key}: ' + values
+        res += f'\n{prefix[OFFSET:]}{OLD_PREFIX}{key}: ' \
+            + format_value(value[VALUE], nesting + 1)
 
     elif value[STATUS] == 'changed':
-        values = formats_value(value['old_value'], nesting+1)
-        res += f'\n{prefix[OFFSET:]}{OLD_PREFIX}{key}: ' + values
+        res += f'\n{prefix[OFFSET:]}{OLD_PREFIX}{key}: ' \
+            + format_value(value['old_value'], nesting + 1)
 
-        values = formats_value(value['new_value'], nesting+1)
-        res += f'\n{prefix[OFFSET:]}{NEW_PREFIX}{key}: ' + values
+        res += f'\n{prefix[OFFSET:]}{NEW_PREFIX}{key}: ' \
+            + format_value(value['new_value'], nesting + 1)
 
     return res
 
 
-def formats_data(data: dict, nesting=0) -> list:
+def format_data(data: dict, nesting=0) -> list:
     res = ''
 
     # If dictionary sorting is broken.
     for key, value in sorted(data.items(), key=lambda x: x[0]):
-        res += statuses(key, value, nesting)
+        res += make_line(key, value, nesting)
 
     return res
 
 
 def make_stylish(data: dict) -> str:
-    lines = formats_data(data)
+    lines = format_data(data)
 
     return f'{BLOCK_START}{lines}\n{BLOCK_END}'
