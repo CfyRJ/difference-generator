@@ -8,8 +8,8 @@
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/CfyRJ/python-project-50/workflows/hexlet-check/badge.svg)](https://github.com/CfyRJ/python-project-50/actions/workflows/hexlet-check.yml)
 [![Actions Status](https://github.com/CfyRJ/python-project-50/actions/workflows/gendiff.yml/badge.svg?branch=main)](https://github.com/CfyRJ/python-project-50/actions/workflows/gendiff.yml)
-[![Maintainability](https://api.codeclimate.com/v1/badges/d6ebd2ae6b18ae3fd68d/maintainability)](https://codeclimate.com/github/CfyRJ/python-project-50/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/d6ebd2ae6b18ae3fd68d/test_coverage)](https://codeclimate.com/github/CfyRJ/python-project-50/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/6cd68c52566c494a056a/maintainability)](https://codeclimate.com/github/CfyRJ/difference-generator/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/6cd68c52566c494a056a/test_coverage)](https://codeclimate.com/github/CfyRJ/difference-generator/test_coverage)
 
 
 ##  Output formats
